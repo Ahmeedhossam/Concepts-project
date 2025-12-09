@@ -5,95 +5,64 @@ namespace GameOfLifeImperative
 {
     class Program
     {
-        // =========================================================
-        // 1. Main Entry Point (نقطة البداية)
-        // =========================================================
         static void Main(string[] args)
         {
-            // إعدادات مساحة اللعبة
-            int rows = 30;  // عدد الصفوف
-            int cols = 60;  // عدد الأعمدة
+            int rows = 30;
+            int cols = 60;
 
-            // إنشاء الشبكة
             bool[,] grid = new bool[rows, cols];
 
-            // اختيار وضع البداية
-            RandomGrid(grid);     // الوضع العشوائي
-            //gliderpattern(grid); // وضع Glider للاختبار
+            RandomGrid(grid);
+            //gliderpattern(grid);
 
-            // إخفاء المؤشر لتحسين المظهر
             Console.CursorVisible = false;
 
-            // حلقة اللعبة (Game Loop)
             while (true)
             {
-                // إعادة المؤشر للأول
                 Console.SetCursorPosition(0, 0);
 
-                // 1. رسم الجيل الحالي
                 PrintGrid(grid);
 
-                // 2. حساب الجيل القادم (Imperative Logic + Higher Order)
-                // التعديل: غيرنا الاسم هنا لـ Gamerules
-                grid = GetNextGeneration(grid, Gamerules);
+                grid = GetNextGeneration(grid, Gamerules); //Variable Reassignment (mutability) // here we are changing the grid to be the next generation grid
 
-                // 3. انتظار لرؤية الحركة
                 Thread.Sleep(200);
             }
         }
 
-        // =========================================================
-        // دالة القواعد (Higher Order Logic)
-        // دي الدالة اللي بتتبعت كـ Parameter
-        // =========================================================
-        // التعديل: الاسم بقى Gamerules والمتغير بقى LiveorDead
         static bool Gamerules(bool LiveorDead, int neighbors)
         {
             if (LiveorDead)
             {
-                // تعيش لو حواليها 2 أو 3، غير كدة تموت
                 return (neighbors == 2 || neighbors == 3);
             }
             else
             {
-                // تصحى لو حواليها 3 بالظبط
                 return (neighbors == 3);
             }
         }
 
-        // =========================================================
-        // 2. Core Logic: Imperative Paradigm (المنطق الإلزامي)
-        // =========================================================
-        public static bool[,] GetNextGeneration(bool[,] currentGrid, Func<bool, int, bool> rule)
-        {
+        public static bool[,] GetNextGeneration(bool[,] currentGrid, Func<bool, int, bool> cellrule) //Func<bool, int, bool> cellrule means if cell is alive or dead and number of neighbors return if cell will be alive or dead in next generation and this is a delegate
+        {                                                                                            //→ يأخذ bool و int                         ويرجع     bool . 
             int rows = currentGrid.GetLength(0);
             int cols = currentGrid.GetLength(1);
 
-            // مصفوفة جديدة عشان النتيجة (Mutable State Update Pattern)
             bool[,] newGrid = new bool[rows, cols];
 
-            // Loop 1: التكرار على الصفوف
             for (int i = 0; i < rows; i++)
             {
-                // Loop 2: التكرار على الأعمدة
                 for (int j = 0; j < cols; j++)
                 {
-                    // حساب الجيران
                     int liveNeighbors = CountNeighbors(currentGrid, i, j);
 
-                    // التعديل: غيرنا اسم المتغير هنا لـ LiveorDead
                     bool LiveorDead = currentGrid[i, j];
 
-                    // تطبيق القواعد باستخدام الدالة المبعوتة
-                    // التعديل: مررنا المتغير بالاسم الجديد
-                    newGrid[i, j] = rule(LiveorDead, liveNeighbors);
-                }
+                    newGrid[i, j] = cellrule(LiveorDead, liveNeighbors); //bb3t each cell live or dead and neighbors to the rule function to know the cell in next generation will be alive or not w b3d m a5ls kol el cells b return el grid kolha bl cells kolha
+                }                                                        //here is the mutation the newGrid is being changed
             }
 
-            return newGrid;
+            return newGrid; // hna el grid 3la b3dha b2a fel next generation el current 
         }
 
-        // دالة مساعدة لعد الجيران المحيطين (8 خلايا)
         private static int CountNeighbors(bool[,] grid, int x, int y)
         {
             int count = 0;
@@ -104,13 +73,11 @@ namespace GameOfLifeImperative
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    // تجاهل الخلية نفسها
                     if (i == 0 && j == 0) continue;
 
                     int newX = x + i;
                     int newY = y + j;
 
-                    // التأكد إننا جوه حدود المصفوفة Check Boundaries
                     if (newX >= 0 && newX < rows && newY >= 0 && newY < cols)
                     {
                         if (grid[newX, newY])
@@ -123,12 +90,7 @@ namespace GameOfLifeImperative
             return count;
         }
 
-        // =========================================================
-        // 3. Initialization Helpers (دوال التجهيز)
-        // =========================================================
-
-        // دالة التجهيز العشوائي
-        static void RandomGrid(bool[,] grid)
+        static void RandomGrid(bool[,] grid) //Pass By Reference behavior (mutability) in grid
         {
             Random rand = new Random();
             int rows = grid.GetLength(0);
@@ -138,7 +100,6 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    // احتمال 20% تكون حية
                     if (rand.Next(5) == 0)
                     {
                         grid[i, j] = true;
@@ -151,7 +112,6 @@ namespace GameOfLifeImperative
             }
         }
 
-        // دالة وضع Glider (للاختبار)
         static void gliderpattern(bool[,] grid)
         {
             if (grid.GetLength(0) > 5 && grid.GetLength(1) > 5)
@@ -164,9 +124,6 @@ namespace GameOfLifeImperative
             }
         }
 
-        // =========================================================
-        // 4. UI / Display Helpers (دوال العرض)
-        // =========================================================
         static void PrintGrid(bool[,] grid)
         {
             int rows = grid.GetLength(0);
