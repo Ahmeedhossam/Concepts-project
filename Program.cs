@@ -17,13 +17,9 @@ namespace GameOfLifeImperative
             // إنشاء الشبكة
             bool[,] grid = new bool[rows, cols];
 
-            // اختيار وضع البداية (فك التعليق عن الوضع الذي تريده)
-
-            // الخيار 1: الوضع العشوائي (ممتع للمشاهدة)
-            InitializeRandomGrid(grid);
-
-            // الخيار 2: وضع Glider (جيد للاختبار والتأكد من صحة القواعد)
-            //InitializeGlider(grid);
+            // اختيار وضع البداية
+            RandomGrid(grid);     // الوضع العشوائي
+            //gliderpattern(grid); // وضع Glider للاختبار
 
             // إخفاء المؤشر لتحسين المظهر
             Console.CursorVisible = false;
@@ -31,30 +27,49 @@ namespace GameOfLifeImperative
             // حلقة اللعبة (Game Loop)
             while (true)
             {
-                // إعادة المؤشر للأول (أفضل من Clear لتقليل الرعشة)
+                // إعادة المؤشر للأول
                 Console.SetCursorPosition(0, 0);
 
                 // 1. رسم الجيل الحالي
-                Console.Clear();
                 PrintGrid(grid);
 
-                // 2. حساب الجيل القادم (Imperative Logic)
-                grid = GetNextGeneration(grid);
+                // 2. حساب الجيل القادم (Imperative Logic + Higher Order)
+                // التعديل: غيرنا الاسم هنا لـ Gamerules
+                grid = GetNextGeneration(grid, Gamerules);
 
                 // 3. انتظار لرؤية الحركة
-                Thread.Sleep(800);
+                Thread.Sleep(200);
+            }
+        }
+
+        // =========================================================
+        // دالة القواعد (Higher Order Logic)
+        // دي الدالة اللي بتتبعت كـ Parameter
+        // =========================================================
+        // التعديل: الاسم بقى Gamerules والمتغير بقى LiveorDead
+        static bool Gamerules(bool LiveorDead, int neighbors)
+        {
+            if (LiveorDead)
+            {
+                // تعيش لو حواليها 2 أو 3، غير كدة تموت
+                return (neighbors == 2 || neighbors == 3);
+            }
+            else
+            {
+                // تصحى لو حواليها 3 بالظبط
+                return (neighbors == 3);
             }
         }
 
         // =========================================================
         // 2. Core Logic: Imperative Paradigm (المنطق الإلزامي)
         // =========================================================
-        public static bool[,] GetNextGeneration(bool[,] currentGrid)
+        public static bool[,] GetNextGeneration(bool[,] currentGrid, Func<bool, int, bool> rule)
         {
             int rows = currentGrid.GetLength(0);
             int cols = currentGrid.GetLength(1);
 
-            // مصفوفة جديدة عشان النتيجة (عشان مغيرش في الحالية وأنا بحسب)
+            // مصفوفة جديدة عشان النتيجة (Mutable State Update Pattern)
             bool[,] newGrid = new bool[rows, cols];
 
             // Loop 1: التكرار على الصفوف
@@ -65,30 +80,13 @@ namespace GameOfLifeImperative
                 {
                     // حساب الجيران
                     int liveNeighbors = CountNeighbors(currentGrid, i, j);
-                    bool isAlive = currentGrid[i, j];
 
-                    // تطبيق القواعد الأربعة بـ IF/ELSE Statements
-                    if (isAlive)
-                    {
-                        // قاعدة الوحدة (أقل من 2) أو الزحمة (أكتر من 3) -> تموت
-                        if (liveNeighbors < 2 || liveNeighbors > 3)
-                        {
-                            newGrid[i, j] = false;
-                        }
-                        // قاعدة البقاء (2 أو 3) -> تعيش
-                        else
-                        {
-                            newGrid[i, j] = true;
-                        }
-                    }
-                    else
-                    {
-                        // قاعدة التكاثر (بالضبط 3) -> تصحى
-                        if (liveNeighbors == 3)
-                        {
-                            newGrid[i, j] = true;
-                        }
-                    }
+                    // التعديل: غيرنا اسم المتغير هنا لـ LiveorDead
+                    bool LiveorDead = currentGrid[i, j];
+
+                    // تطبيق القواعد باستخدام الدالة المبعوتة
+                    // التعديل: مررنا المتغير بالاسم الجديد
+                    newGrid[i, j] = rule(LiveorDead, liveNeighbors);
                 }
             }
 
@@ -129,8 +127,8 @@ namespace GameOfLifeImperative
         // 3. Initialization Helpers (دوال التجهيز)
         // =========================================================
 
-        // دالة التجهيز العشوائي (بنسبة 20%)
-        static void InitializeRandomGrid(bool[,] grid)
+        // دالة التجهيز العشوائي
+        static void RandomGrid(bool[,] grid)
         {
             Random rand = new Random();
             int rows = grid.GetLength(0);
@@ -140,8 +138,7 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    // رقم عشوائي من 0 لـ 4 (5 احتمالات)
-                    // لو طلع 0 (احتمال 20%) تبقى حية
+                    // احتمال 20% تكون حية
                     if (rand.Next(5) == 0)
                     {
                         grid[i, j] = true;
@@ -155,9 +152,8 @@ namespace GameOfLifeImperative
         }
 
         // دالة وضع Glider (للاختبار)
-        static void InitializeGlider(bool[,] grid)
+        static void gliderpattern(bool[,] grid)
         {
-            // تأكد إن المصفوفة كبيرة كفاية قبل وضع القيم
             if (grid.GetLength(0) > 5 && grid.GetLength(1) > 5)
             {
                 grid[1, 2] = true;
@@ -180,7 +176,6 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    // لو حية ارسم O لو ميتة ارسم نقطة .
                     Console.Write(grid[i, j] ? "O" : ".");
                 }
                 Console.WriteLine();
