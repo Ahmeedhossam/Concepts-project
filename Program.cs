@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading;
-
-namespace GameOfLifeImperative
+﻿namespace GameOfLifeImperative
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             int rows = 30;
             int cols = 60;
@@ -29,7 +26,7 @@ namespace GameOfLifeImperative
             }
         }
 
-        static bool Gamerules(bool LiveorDead, int neighbors) // hna bashof el cell fe el next generation hayb2a 3ayesh wla mayet based on el rules wl return boolean 3la 7sb mmkn msln tb2a 3aysha w tmoot b3dha lw el return false 
+        private static bool Gamerules(bool LiveorDead, int neighbors) // hna bashof el cell fe el next generation hayb2a 3ayesh wla mayet based on el rules wl return boolean 3la 7sb mmkn msln tb2a 3aysha w tmoot b3dha lw el return false
         {
             if (LiveorDead)
             {
@@ -42,7 +39,7 @@ namespace GameOfLifeImperative
         }
 
         public static bool[,] GetNextGeneration(bool[,] currentGrid, Func<bool, int, bool> cellrule) //Func<bool, int, bool> cellrule means if cell is alive or dead and number of neighbors return if cell will be alive or dead in next generation and this is a delegate
-        {                                                                                            //→ يأخذ bool و int                         ويرجع     bool . 
+        {                                                                                            //→ يأخذ bool و int                         ويرجع     bool .
             int rows = currentGrid.GetLength(0);
             int cols = currentGrid.GetLength(1);
 
@@ -60,7 +57,7 @@ namespace GameOfLifeImperative
                 }                                                        //here is the mutation the newGrid is being changed
             }
 
-            return newGrid; // hna el grid 3la b3dha b2a fel next generation el current 
+            return newGrid; // hna el grid 3la b3dha b2a fel next generation el current
         }
 
         private static int CountNeighbors(bool[,] grid, int x, int y)
@@ -90,7 +87,7 @@ namespace GameOfLifeImperative
             return count;
         }
 
-        static void RandomGrid(bool[,] grid) //Pass By Reference behavior (mutability) in grid
+        private static void RandomGrid(bool[,] grid) //Pass By Reference behavior (mutability) in grid
         {
             Random rand = new Random();
             int rows = grid.GetLength(0);
@@ -112,7 +109,7 @@ namespace GameOfLifeImperative
             }
         }
 
-        static void gliderpattern(bool[,] grid)
+        private static void gliderpattern(bool[,] grid)
         {
             if (grid.GetLength(0) > 5 && grid.GetLength(1) > 5)
             {
@@ -124,7 +121,7 @@ namespace GameOfLifeImperative
             }
         }
 
-        static void PrintGrid(bool[,] grid)
+        private static void PrintGrid(bool[,] grid)
         {
             int rows = grid.GetLength(0);
             int cols = grid.GetLength(1);
@@ -133,7 +130,7 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    Console.Write(grid[i, j] ? "O" : "."); //lw true etb333 O else print . 
+                    Console.Write(grid[i, j] ? "O" : "."); //lw true etb333 O else print .
                 }
                 Console.WriteLine();
             }
