@@ -12,8 +12,8 @@ namespace GameOfLifeImperative
 
             bool[,] grid = new bool[rows, cols];
 
-            RandomGrid(grid);
-            //gliderpattern(grid);
+            //RandomGrid(grid);
+            gliderpattern(grid);
 
             Console.CursorVisible = false;
 
@@ -23,13 +23,13 @@ namespace GameOfLifeImperative
 
                 PrintGrid(grid);
 
-                grid = GetNextGeneration(grid, Gamerules); //Variable Reassignment (mutability) // here we are changing the grid to be the next generation grid
+                grid = GetNextGeneration(grid, Gamerules); //Variable Reassignment (mutability) // hna we are changing the grid to be the next generation grid
 
                 Thread.Sleep(200);
             }
         }
 
-        static bool Gamerules(bool LiveorDead, int neighbors)
+        static bool Gamerules(bool LiveorDead, int neighbors) // hna bashof el cell fe el next generation hayb2a 3ayesh wla mayet based on el rules wl return boolean 3la 7sb mmkn msln tb2a 3aysha w tmoot b3dha lw el return false 
         {
             if (LiveorDead)
             {
@@ -100,7 +100,7 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    if (rand.Next(5) == 0)
+                    if (rand.Next(5) == 0) //generates number between 0 and 4 lw 0 yb2a 20% chance etb3t true
                     {
                         grid[i, j] = true;
                     }
@@ -133,7 +133,7 @@ namespace GameOfLifeImperative
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    Console.Write(grid[i, j] ? "O" : ".");
+                    Console.Write(grid[i, j] ? "O" : "."); //lw true etb333 O else print . 
                 }
                 Console.WriteLine();
             }
